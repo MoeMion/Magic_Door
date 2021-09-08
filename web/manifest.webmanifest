@@ -1,0 +1,16 @@
+{
+    "background_color": "purple",
+    "description": "将Magicdoor添加至APP列表以快速打开！",
+    "display": "fullscreen",
+    "icons": [
+      {
+        "src": "/icon.png",
+        "sizes": "512x512",
+        "type": "image/png"
+      }
+    ],
+    "name": "MagicDoor",
+    "short_name": "magicdoor",
+    "start_url": "/"
+  }
+  

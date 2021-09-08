@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>MagicDoor | Powered By Mion</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700">
+  <link rel="stylesheet" href="assets/vendor/nucleo/css/nucleo.css" type="text/css">
+  <link rel="stylesheet" href="assets/vendor/@fortawesome/fontawesome-free/css/all.min.css" type="text/css">
+  <link rel="stylesheet" href="assets/css/argon.css?v=1.1.0" type="text/css">
+  <script src="index.js" defer></script>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="shortcut icon" href="favicon.ico">
+  <link
+    rel="shortcut icon"
+    href="icon.png"
+    type="image/x-icon"
+  />
+  <link rel="apple-touch-icon" href="icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="芝麻开门">
+</head>
+
+<body class="bg-default">
+  <!-- Main content -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="header bg-gradient-primary py-7 py-lg-8 pt-lg-9">
+      <div class="container">
+        <div class="header-body text-center mb-7">
+          <div class="row justify-content-center">
+            <div class="col-xl-5 col-lg-6 col-md-8 px-5">
+              <h1 class="text-white">少年，快使用魔力！</h1>
+              <p class="text-lead text-white" id="hitokoto_text">正在给先生作诗...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="separator separator-bottom separator-skew zindex-100">
+        <svg x="0" y="0" viewBox="0 0 2560 100" preserveAspectRatio="none" version="1.1"
+          xmlns="http://www.w3.org/2000/svg">
+          <polygon class="fill-default" points="2560 0 2560 100 0 100"></polygon>
+        </svg>
+      </div>
+    </div>
+    <!-- Page content -->
+    <div class="container mt--8 pb-5">
+      <div class="row justify-content-center">
+        <div class="col-lg-5 col-md-7">
+          <div class="card bg-secondary border-0 mb-0">
+            <div class="card-header bg-transparent pb-5">
+              <div class="text-muted text-center mt-2 mb-3">门禁状态</div>
+              <div class="btn-wrapper text-center">
+                <span class="badge badge-info" id="doorstatus" onclick="getstatus();">查询中</span>
+              </div>
+            </div>
+            <div class="card-body px-lg-5 py-lg-5">
+              <div class="text-center">
+                <button type="button" class="btn btn-primary my-4" onclick="opendoor();">开门</button>
+                <button type="button" class="btn btn-danger my-4 add-button ">安装APP</button>
+              </div>
+              <div class="alert alert-info" role="alert" id="openstatus" style="display:none">
+                查询中...
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Argon Scripts -->
+  <!-- Core -->
+  <script src="assets/vendor/jquery/dist/jquery.min.js"></script>
+  <script src="assets/vendor/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/js-cookie/js.cookie.js"></script>
+  <script src="assets/vendor/jquery.scrollbar/jquery.scrollbar.min.js"></script>
+  <script src="assets/vendor/jquery-scroll-lock/dist/jquery-scrollLock.min.js"></script>
+  <!-- Argon JS -->
+  <script src="assets/js/argon.js?v=1.1.0"></script>
+  <script>
+    fetch('https://v1.hitokoto.cn')
+      .then(response => response.json())
+      .then(data => {
+        const hitokoto = document.getElementById('hitokoto_text')
+        hitokoto.innerText = data.hitokoto
+      })
+      .catch(console.error)
+  </script>
+  <script>
+  function getstatus(){
+    $.ajax( {
+        type : 'get',
+        dataType : 'text',
+        url : 'controller.php?action=check',        
+        success : function(data) {
+          if(data == 100){
+            $("#doorstatus").attr("class","badge badge-success")
+            $("#doorstatus").text("正常")
+          }else{
+            $("#doorstatus").attr("class","badge badge-danger")
+            $("#doorstatus").text("异常")
+          }
+    }
+    });
+  }
+  function freshstatus(){
+    getstatus();
+    setInterval('freshstatus();', 11000);
+  }
+ freshstatus();
+    function opendoor(){
+         $("#openstatus").attr("class","alert alert-info");
+        $("#openstatus").text("提交请求中，请稍后...");
+        $("#openstatus").toggle(500);
+      $.ajax( {
+        type : 'get',
+        dataType : 'text',
+        url : 'controller.php?action=open',        
+        success : function(data) {
+          if(data == 100){
+            $("#openstatus").attr("class","alert alert-success");
+            $("#openstatus").text("门已打开，请在10秒之内进入！");
+            setTimeout('$("#openstatus").toggle(1000);', 5000);
+          }else if (data == 200){
+            $("#openstatus").attr("class","alert alert-warning");
+            $("#openstatus").text("门已打开，请尽快通行！");
+            setTimeout('$("#openstatus").toggle(1000);', 5000);
+          }else{
+            $("#openstatus").attr("class","alert alert-danger");
+            $("#openstatus").text("出现异常，无法开门！");
+            setTimeout('$("#openstatus").toggle(1000);', 5000);
+          }
+    }
+    });
+    }
+  </script>
+  
+  
+
+</body>
+
+</html>
